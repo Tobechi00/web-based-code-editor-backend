@@ -3,8 +3,6 @@ package com.wide.widebackend.service;
 import com.wide.widebackend.Entity.PrincipalUser;
 import com.wide.widebackend.Entity.User;
 import com.wide.widebackend.repository.UserRepository;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +46,6 @@ public class UserService implements UserDetailsService {
 
     //save user
     public void saveUser(User user){
-
         if (user != null){
             userRepository.save(user);
         }else {
@@ -57,7 +54,6 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserById(Long id){
-
             return userRepository.findById(id).orElseThrow(()-> new RuntimeException("user with specified id not found"));
     }
 
@@ -73,6 +69,7 @@ public class UserService implements UserDetailsService {
         );
         return user.getFilePaths();
     }
+
 
     @Transactional
     public void savePathsToUser(User user,List<String> list){

@@ -21,13 +21,14 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    UserService userService;
+    private final UserService userService;
+    private final JwtGenerator jwtGenerator;
+    private final JwtAuthEntryPoint authEntryPoint;
 
-    JwtAuthEntryPoint authEntryPoint;
 
-
-    public SecurityConfig(UserService userService,JwtAuthEntryPoint jwtAuthEntryPoint){
+    public SecurityConfig(UserService userService, JwtGenerator jwtGenerator, JwtAuthEntryPoint jwtAuthEntryPoint){
         this.userService = userService;
+        this.jwtGenerator = jwtGenerator;
         this.authEntryPoint = jwtAuthEntryPoint;
     }
 
@@ -66,7 +67,7 @@ public class SecurityConfig {
 
     @Bean
     public Filter jwtAuthenticationFilter() {
-        return new JWTAuthenticationFilter();
+        return new JWTAuthenticationFilter(jwtGenerator);
     }
 
     //configures cross origin and enables acceptance of requests from localhost:8000 (frontend)

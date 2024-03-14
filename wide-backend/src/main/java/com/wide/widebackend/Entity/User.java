@@ -24,7 +24,6 @@ public class User {
     @Column
     private String lastname;
 
-//    @OneToMany(mappedBy = "userRef", cascade = CascadeType.ALL)
     @ElementCollection
     private List<String> filePaths;
 

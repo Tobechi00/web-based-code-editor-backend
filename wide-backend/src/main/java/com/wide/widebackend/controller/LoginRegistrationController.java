@@ -1,9 +1,8 @@
 package com.wide.widebackend.controller;
 
 import com.wide.widebackend.Entity.User;
-import com.wide.widebackend.config.JWTGenerator;
-import com.wide.widebackend.dao.LoginDao;
-import com.wide.widebackend.dao.UserPayloadDao;
+import com.wide.widebackend.config.JwtGenerator;
+import com.wide.widebackend.dao.UserDto;
 import com.wide.widebackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -25,49 +24,49 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginRegistrationController {
 
     @Autowired
-    UserService userService;
-    JWTGenerator jwtGenerator;
+    private final UserService userService;
+    private final JwtGenerator jwtGenerator;
 
     DaoAuthenticationProvider authenticationProvider;
     Logger logger = LoggerFactory.getLogger(LoginRegistrationController.class);
 
-    public LoginRegistrationController(UserService userService,JWTGenerator jwtGenerator,DaoAuthenticationProvider daoAuthenticationProvider) {
+    public LoginRegistrationController(UserService userService, JwtGenerator jwtGenerator, DaoAuthenticationProvider daoAuthenticationProvider) {
         this.userService = userService;
         this.jwtGenerator = jwtGenerator;
         this.authenticationProvider = daoAuthenticationProvider;
     }
-    //method for facilitating user login
+
+    //user login api
     @PostMapping(value = "/login")
-    public ResponseEntity<UserPayloadDao> login(@RequestBody LoginDao loginDao){
+    public ResponseEntity<UserDto> login(@RequestBody LoginDao loginDao){
 
         try {
             //todo:keeps returning null user fix later or roll back
 
             //auth
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDao.getUsername(), loginDao.getPassword());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDao.username(), loginDao.password());
             Authentication authentication = authenticationProvider.authenticate(authenticationToken);
 
             //generate token
             String userToken = jwtGenerator.generateToken(authentication);
 
             //create payload
-            User user = userService.getUserByUsername(loginDao.getUsername());
-            UserPayloadDao payload = new UserPayloadDao();
+            User user = userService.getUserByUsername(loginDao.username());
+            UserDto payload = new UserDto();
             payload.setUsername(user.getEmail());
             payload.setLastName(user.getLastname());
             payload.setFirstName(user.getFirstname());
             payload.setId(user.getId());
             payload.setToken(userToken);
 
-
             return ResponseEntity.ok().body(payload);
-
         }catch (AuthenticationException | NullPointerException e ){
             logger.warn(e.getMessage());
             }
 
             return ResponseEntity.notFound().build();
         }
+
 
     //user registration api
     @PostMapping(value = "/register")
@@ -80,5 +79,7 @@ public class LoginRegistrationController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    record LoginDao(String username,String password){}
     }
 

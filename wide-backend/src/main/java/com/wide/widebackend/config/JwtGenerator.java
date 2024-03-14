@@ -12,7 +12,7 @@ import java.util.Date;
 
 
 @Component
-public class JWTGenerator {
+public class JwtGenerator {
 
     //responsible for the generation of a JWT which is to be sent back to the end user
     public String generateToken(Authentication authentication){

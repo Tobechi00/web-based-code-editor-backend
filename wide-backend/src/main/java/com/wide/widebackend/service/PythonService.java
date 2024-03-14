@@ -1,7 +1,7 @@
 package com.wide.widebackend.service;
 
 
-import com.wide.widebackend.dao.ProgramOutputDao;
+import com.wide.widebackend.dao.ProgramOutputDto;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,14 +9,26 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 
+/**
+ * service containing methods for executing python code
+ * is executed on a docker container instance
+ * the resultant exit code and output code is collected
+ **/
+
 @Slf4j
 @Service
 public class PythonService {
 
     Logger logger = LoggerFactory.getLogger(PythonService.class);
-    public ProgramOutputDao runPythonCode(String pyCode){
 
-        ProgramOutputDao programOutputDao = new ProgramOutputDao();
+    /**
+     * runs provided python code on docker instance command line
+     * @param pyCode python code to be executed
+     * @return instance of programOutPutDto
+     **/
+    public ProgramOutputDto runPythonCode(String pyCode){
+
+        ProgramOutputDto programOutputDto = new ProgramOutputDto();
 
         try {
 
@@ -27,7 +39,6 @@ public class PythonService {
 
             // Create a process builder
             ProcessBuilder processBuilder = new ProcessBuilder(command);
-
 
             // Redirect error stream to standard output
             processBuilder.redirectErrorStream(true);
@@ -53,20 +64,27 @@ public class PythonService {
             inputStream.close();
             reader.close();
             //setting DAO;
-            programOutputDao.setExitCode(exitCode);
+            programOutputDto.setExitCode(exitCode);
 
-            programOutputDao.setProgramOutput(programOutput.toString());
+            programOutputDto.setProgramOutput(programOutput.toString());
 
-            return programOutputDao;
+            return programOutputDto;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    public ProgramOutputDao runPythonCode(String pyCode,String userInput){
+    /**
+     * overlaoded variant of runPythonCode
+     * expects user input to prevent infinite loop
+     * @param pyCode python code to be executed
+     * @param userInput expected user input
+     * @return instance of programOutPutDto
+     **/
+    public ProgramOutputDto runPythonCode(String pyCode, String userInput){
 
-        ProgramOutputDao programOutputDao = new ProgramOutputDao();
+        ProgramOutputDto programOutputDto = new ProgramOutputDto();
 
         try {
 
@@ -104,11 +122,9 @@ public class PythonService {
 
                 programOutput.append(line);
             }
-            logger.warn("line reached");
 
             // Wait for the process to complete
             int exitCode = process.waitFor();
-//            System.out.println("Exited with error code: " + exitCode);
 
             inputStream.close();
             reader.close();
@@ -116,12 +132,10 @@ public class PythonService {
 
 
             //setting DAO;
-            programOutputDao.setExitCode(exitCode);
+            programOutputDto.setExitCode(exitCode);
+            programOutputDto.setProgramOutput(programOutput.toString());
 
-            programOutputDao.setProgramOutput(programOutput.toString());
-
-
-            return programOutputDao;
+            return programOutputDto;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

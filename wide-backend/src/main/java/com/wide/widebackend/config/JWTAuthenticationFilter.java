@@ -1,13 +1,11 @@
 package com.wide.widebackend.config;
 
-import com.wide.widebackend.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,13 +17,14 @@ custom authentication filter which verifies the integrity of the token contained
 
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JWTGenerator jwtGenerator;
 
-    @Autowired
-    private UserService userService;
+    private final JwtGenerator jwtGenerator;
 
     Logger logger = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+
+    public JWTAuthenticationFilter(JwtGenerator jwtGenerator) {
+        this.jwtGenerator = jwtGenerator;
+    }
 
 
     @Override

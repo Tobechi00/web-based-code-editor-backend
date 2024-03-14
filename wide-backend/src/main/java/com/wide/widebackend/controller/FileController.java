@@ -21,15 +21,14 @@ controller for all file processing and retrieval apis
 public class FileController {
 
     Logger logger = LoggerFactory.getLogger(FileController.class);
-    UserService userService;
+    private final UserService userService;
 
     public FileController(UserService userService){
         this.userService = userService;
     }
 
-    //todo: use records for dtos
 
-    //duplicate for save-As!!!
+    //api for saving new content to already created files
     @PostMapping(value ="/files/save/{id}")
     public ResponseEntity<String> saveFiles(@PathVariable Long id,@RequestBody SaveFileDTO saveFileDTO) {
 
@@ -52,7 +51,8 @@ public class FileController {
         }
     }
 
-    //todo: rewrite this monstrosity; use try with resources and close those leaks also change file renaming method https://stackoverflow.com/questions/1158777/rename-a-file-using-java
+
+    //api for creating new files or renaming already existing files and writing content to them
     @PostMapping(value = "/files/save-as/{id}")
     ResponseEntity<String> saveFilesAs(@PathVariable Long id, @RequestBody SaveAsFileDTO saveAsFileDTO){
 
@@ -120,11 +120,6 @@ public class FileController {
 
 
 
-    //received file DTO
-    record SaveFileDTO(String fileName,String fileContent){}
-
-    //change this for the frontend too
-    record SaveAsFileDTO(String oldFilePath,String newFilePath,String fileContent){}
 
     //method to get all files by provided user id
     @GetMapping(value = "/files/getAllFiles/{id}")
@@ -162,6 +157,7 @@ public class FileController {
         }
     }
 
+    //controller responsible for updating existing files
     @PutMapping(value = "files/updateExistingFile")
     public ResponseEntity<String> updateFileByFileName(@RequestBody String filePath, @RequestBody String replacementContent){
 
@@ -176,6 +172,12 @@ public class FileController {
             return ResponseEntity.internalServerError().body("an error occurred while trying to process file");
         }
     }
+
+    //dto for normal save operation
+    record SaveFileDTO(String fileName,String fileContent){}
+
+    //dto for save-as operation
+    record SaveAsFileDTO(String oldFilePath,String newFilePath,String fileContent){}
 
     public String extractFileNameFromPath(String path){
         return path.substring(path.lastIndexOf("\\")+1);
