@@ -1,11 +1,12 @@
 package com.wide.widebackend.controller;
 
-import com.wide.widebackend.dao.ProgramInputDao;
-import com.wide.widebackend.dao.ProgramOutputDto;
+import com.wide.widebackend.dataobjects.dao.ProgramInputDAO;
+import com.wide.widebackend.dataobjects.dto.ProgramOutputDTO;
 import com.wide.widebackend.service.PythonService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping(path = "/w-ide/api")
 public class ProgramRunnerController {
 
-    //todo: remove reliance on error code 555
 
     private final PythonService pythonService;
 
@@ -33,20 +33,19 @@ public class ProgramRunnerController {
 
     //method for handling python code compilation requests
     @PostMapping(value = "/python/submit")
-    public ResponseEntity<ProgramOutputDto> runCode(@RequestBody ProgramInputDao programInputDao){
+    public ResponseEntity<ProgramOutputDTO> runCode(@RequestBody ProgramInputDAO programInputDao){
 
-        System.out.println("cat");
         if (programInputDao.getUserInput().isEmpty()){
         try{
-            CompletableFuture<ProgramOutputDto> future = CompletableFuture.supplyAsync(() ->
+            CompletableFuture<ProgramOutputDTO> future = CompletableFuture.supplyAsync(() ->
                     pythonService.runPythonCode(programInputDao.getProgram())
             );
 
-            ProgramOutputDto result = future.orTimeout(10, TimeUnit.SECONDS) // Set your desired timeout here
+            ProgramOutputDTO result = future.orTimeout(10, TimeUnit.SECONDS) // Set your desired timeout here
                     .exceptionally(throwable -> {
                         // Handle timeout exception
                         // You can customize the ProgramOutputDao for timeout if needed
-                        return new ProgramOutputDto("Error: code took too long to execute",555);
+                        return new ProgramOutputDTO("Error: code took too long to execute",555);
                     }).join();
 
             return ResponseEntity.ok(result);
@@ -57,16 +56,16 @@ public class ProgramRunnerController {
 
     }else {
             try {
-                CompletableFuture<ProgramOutputDto> future = CompletableFuture.supplyAsync(() ->
+                CompletableFuture<ProgramOutputDTO> future = CompletableFuture.supplyAsync(() ->
                         pythonService.runPythonCode(programInputDao.getProgram(), programInputDao.getUserInput().get())
                 );
 
                 // Apply a timeout to the CompletableFuture
-                ProgramOutputDto result = future.orTimeout(20, TimeUnit.SECONDS)
+                ProgramOutputDTO result = future.orTimeout(20, TimeUnit.SECONDS)
                         .exceptionally(throwable -> {
                             // Handle timeout exception
                             // 555 is a custom error
-                            return new ProgramOutputDto("Error: code took too long to execute",555);
+                            return new ProgramOutputDTO("Error: code took too long to execute", HttpStatus.EXPECTATION_FAILED.value());
                         }).join();
 
                 return ResponseEntity.ok(result);

@@ -2,6 +2,7 @@ package com.wide.widebackend.service;
 
 import com.wide.widebackend.Entity.PrincipalUser;
 import com.wide.widebackend.Entity.User;
+import com.wide.widebackend.customexceptions.UserAlreadyExistsException;
 import com.wide.widebackend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -45,11 +46,18 @@ public class UserService implements UserDetailsService {
 
 
     //save user
-    public void saveUser(User user){
-        if (user != null){
-            userRepository.save(user);
+    public void saveUser(User user) throws UserAlreadyExistsException {
+        //if user already exists
+        User savedUser = userRepository.findUserByUsername(user.getEmail());
+
+        if (savedUser == null){
+            try {
+                userRepository.save(user);
+            }catch (Exception e){
+                logger.error(e.getMessage());
+            }
         }else {
-            throw new NullPointerException("user provided is null");
+            throw new UserAlreadyExistsException(String.format("a user with username %s already exists",user.getEmail()));
         }
     }
 

@@ -1,11 +1,11 @@
-package com.wide.widebackend.dao;
+package com.wide.widebackend.dataobjects.dao;
 
 /**
 * dto containing user information that can be used for subsequent user requests
 */
 
 
-public class UserDto {
+public class UserDTO {
 
     private String username;
     private String firstName;
@@ -13,9 +13,9 @@ public class UserDto {
     private Long id;
     private String token;
 
-    public UserDto(){}
+    public UserDTO(){}
 
-    public UserDto(String username, String firstName, String lastName, Long id, String token) {
+    public UserDTO(String username, String firstName, String lastName, Long id, String token) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;

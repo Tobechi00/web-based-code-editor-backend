@@ -1,5 +1,6 @@
 package com.wide.widebackend.config;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
 custom authentication filter which verifies the integrity of the token contained in a received request
@@ -28,11 +31,18 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain filterChain) throws ServletException, IOException {
         String token = getJwtFromRequest(request);
         String requestURI = request.getRequestURI();
-        if (!requestURI.equals("/w-ide/api/login")){
+
+        //paths ignored by jwt filter
+        Set<String> authIgnorePaths = new HashSet<>();
+        authIgnorePaths.add("/w-ide/api/login");
+        authIgnorePaths.add("/w-ide/api/register");
+
+        if (authIgnorePaths.contains(requestURI)){
+            filterChain.doFilter(request,response);
+        }else {
             try {
                 jwtGenerator.validate(token);
                 filterChain.doFilter(request,response);
@@ -40,8 +50,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
                 logger.error(e.getMessage());
             }
-        }else {
-            filterChain.doFilter(request,response);
         }
         }
 

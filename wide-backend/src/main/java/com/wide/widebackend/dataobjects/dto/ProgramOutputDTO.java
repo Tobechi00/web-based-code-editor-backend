@@ -1,14 +1,14 @@
-package com.wide.widebackend.dao;
+package com.wide.widebackend.dataobjects.dto;
 
-public class ProgramOutputDto {
+public class ProgramOutputDTO {
 
     private String programOutput;
 
     private int exitCode;
 
-    public ProgramOutputDto(){}
+    public ProgramOutputDTO(){}
 
-    public ProgramOutputDto(String programOutput, int exitCode){
+    public ProgramOutputDTO(String programOutput, int exitCode){
         this.programOutput = programOutput;
         this.exitCode = exitCode;
     }
