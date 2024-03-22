@@ -173,11 +173,13 @@ public class FileController {
         }
     }
 
+    //TODO:REMOVE DTOs
+
     //dto for normal save operation
-    record SaveFileDTO(String fileName,String fileContent){}
+    public record SaveFileDTO(String fileName,String fileContent){}
 
     //dto for save-as operation
-    record SaveAsFileDTO(String oldFilePath,String newFilePath,String fileContent){}
+    public record SaveAsFileDTO(String oldFilePath,String newFilePath,String fileContent){}
 
     public String extractFileNameFromPath(String path){
         return path.substring(path.lastIndexOf("\\")+1);

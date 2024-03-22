@@ -1,7 +1,7 @@
 package com.wide.widebackend.service;
 
 
-import com.wide.widebackend.dao.ProgramOutputDto;
+import com.wide.widebackend.dataobjects.dto.ProgramOutputDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +26,9 @@ public class PythonService {
      * @param pyCode python code to be executed
      * @return instance of programOutPutDto
      **/
-    public ProgramOutputDto runPythonCode(String pyCode){
+    public ProgramOutputDTO runPythonCode(String pyCode){
 
-        ProgramOutputDto programOutputDto = new ProgramOutputDto();
+        ProgramOutputDTO programOutputDto = new ProgramOutputDTO();
 
         try {
 
@@ -82,9 +82,9 @@ public class PythonService {
      * @param userInput expected user input
      * @return instance of programOutPutDto
      **/
-    public ProgramOutputDto runPythonCode(String pyCode, String userInput){
+    public ProgramOutputDTO runPythonCode(String pyCode, String userInput){
 
-        ProgramOutputDto programOutputDto = new ProgramOutputDto();
+        ProgramOutputDTO programOutputDto = new ProgramOutputDTO();
 
         try {
 
@@ -126,6 +126,7 @@ public class PythonService {
             // Wait for the process to complete
             int exitCode = process.waitFor();
 
+            //close all writers and streams
             inputStream.close();
             reader.close();
             bufferedWriter.close();

@@ -1,8 +1,8 @@
-package com.wide.widebackend.dao;
+package com.wide.widebackend.dataobjects.dao;
 
 import java.util.Optional;
 
-public class ProgramInputDao {
+public class ProgramInputDAO {
 
     private String programmingLanguage;
 
