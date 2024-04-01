@@ -9,12 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 
-/**
- * service containing methods for executing python code
- * is executed on a docker container instance
- * the resultant exit code and output code is collected
- **/
-
 @Slf4j
 @Service
 public class PythonService {
@@ -23,6 +17,7 @@ public class PythonService {
 
     /**
      * runs provided python code on docker instance command line
+     * makes use of the python container - py_code_container
      * @param pyCode python code to be executed
      * @return instance of programOutPutDto
      **/
@@ -35,7 +30,7 @@ public class PythonService {
             StringBuilder programOutput = new StringBuilder();
 
             //array of commands to be run sequentially
-            String[] command = {"docker", "run", "-i", "--rm", "python", "python", "-c",pyCode};
+            String[] command = {"docker", "exec", "-i", "py_code_container", "python", "-c",pyCode};
 
             // Create a process builder
             ProcessBuilder processBuilder = new ProcessBuilder(command);
