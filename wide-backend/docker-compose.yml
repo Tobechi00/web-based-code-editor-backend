@@ -1,0 +1,6 @@
+version: '3.1'
+services:
+  py_code_container:
+    container_name: py_code_container
+    image: python
+    command: tail -f /dev/null
