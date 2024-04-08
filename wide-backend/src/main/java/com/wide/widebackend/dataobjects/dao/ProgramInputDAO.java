@@ -10,28 +10,34 @@ public class ProgramInputDAO {
 
     private Optional<String> userInput;
 
+    //used to name the java file that will be created on the docker container
+    private Optional<String> fileName;
+
+
 
     public String getProgrammingLanguage() {
         return programmingLanguage;
-    }
-
-    public void setProgrammingLanguage(String programmingLanguage) {
-        this.programmingLanguage = programmingLanguage;
     }
 
     public String getProgram() {
         return this.program;
     }
 
-    public void setProgram(String program) {
-        this.program = program;
-    }
-
     public Optional<String> getUserInput() {
         return this.userInput;
     }
 
-    public void setUserInput(Optional<String> userInput) {
-        this.userInput = userInput;
+    public Optional<String> getFileName() {
+        return fileName;
+    }
+
+    @Override
+    public String toString() {
+        return "ProgramInputDAO{" +
+                "programmingLanguage='" + programmingLanguage + '\'' +
+                ", program='" + program + '\'' +
+                ", userInput=" + userInput +
+                ", fileName=" + fileName +
+                '}';
     }
 }

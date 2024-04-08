@@ -1,0 +1,10 @@
+package com.wide.widebackend.service;
+
+import java.util.Optional;
+
+public interface CodeRunnerService<T> {
+
+    public T runCodeWithoutInput(String code,Optional<String> fileName);
+
+    public T runCodeWithInput(String code, String input, Optional<String> fileName);
+}

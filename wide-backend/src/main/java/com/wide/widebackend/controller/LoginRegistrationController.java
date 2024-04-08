@@ -35,7 +35,7 @@ public class LoginRegistrationController {
 
     private final DaoAuthenticationProvider authenticationProvider;
     private final PasswordEncoder passwordEncoder;
-    Logger logger = LoggerFactory.getLogger(LoginRegistrationController.class);
+    private final Logger logger = LoggerFactory.getLogger(LoginRegistrationController.class);
 
     public LoginRegistrationController(UserService userService, JwtGenerator jwtGenerator, DaoAuthenticationProvider daoAuthenticationProvider,PasswordEncoder passwordEncoder) {
         this.userService = userService;

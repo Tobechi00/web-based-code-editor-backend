@@ -8,20 +8,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.Optional;
 
 @Slf4j
 @Service
-public class PythonService {
+public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> {
 
-    Logger logger = LoggerFactory.getLogger(PythonService.class);
+    private final Logger logger = LoggerFactory.getLogger(PythonRunnerService.class);
 
     /**
      * runs provided python code on docker instance command line
      * makes use of the python container - py_code_container
-     * @param pyCode python code to be executed
+     * @param code python code to be executed
      * @return instance of programOutPutDto
      **/
-    public ProgramOutputDTO runPythonCode(String pyCode){
+
+    @Override
+    public ProgramOutputDTO runCodeWithoutInput(String code,Optional<String> fileName) {
 
         ProgramOutputDTO programOutputDto = new ProgramOutputDTO();
 
@@ -30,10 +33,10 @@ public class PythonService {
             StringBuilder programOutput = new StringBuilder();
 
             //array of commands to be run sequentially
-            String[] command = {"docker", "exec", "-i", "py_code_container", "python", "-c",pyCode};
+            String[] commands = {"docker", "exec", "-i", "py_code_container", "python", "-c", code};
 
             // Create a process builder
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
             // Redirect error stream to standard output
             processBuilder.redirectErrorStream(true);
@@ -49,7 +52,7 @@ public class PythonService {
             String line;
             while ((line = reader.readLine()) != null) {
 
-                programOutput.append(line);
+                programOutput.append(line).append("\n");
             }
 
             // Wait for the process to complete
@@ -65,20 +68,13 @@ public class PythonService {
 
             return programOutputDto;
         } catch (IOException | InterruptedException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
-
     }
 
-    /**
-     * overlaoded variant of runPythonCode
-     * expects user input to prevent infinite loop
-     * @param pyCode python code to be executed
-     * @param userInput expected user input
-     * @return instance of programOutPutDto
-     **/
-    public ProgramOutputDTO runPythonCode(String pyCode, String userInput){
-
+    @Override
+    public ProgramOutputDTO runCodeWithInput(String code, String input,Optional<String> fileName) {
         ProgramOutputDTO programOutputDto = new ProgramOutputDTO();
 
         try {
@@ -87,10 +83,10 @@ public class PythonService {
 
 
             //array of commands to be run sequentially
-            String[] command = {"docker", "run", "-i", "--rm", "python", "python", "-c",pyCode};
+            String[] commands = {"docker", "exec", "-i", "py_code_container", "python", "-c", code, input};
 
             // Create a process builder
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
             // Redirect error stream to standard output
             processBuilder.redirectErrorStream(true);
@@ -102,7 +98,7 @@ public class PythonService {
             OutputStream outputStream = process.getOutputStream();
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
 
-            bufferedWriter.write(userInput);
+            bufferedWriter.write(input);
             bufferedWriter.newLine();
             bufferedWriter.flush();
 
@@ -115,7 +111,7 @@ public class PythonService {
             String line;
             while ((line = reader.readLine()) != null) {
 
-                programOutput.append(line);
+                programOutput.append(line).append("\n");
             }
 
             // Wait for the process to complete
@@ -133,8 +129,8 @@ public class PythonService {
 
             return programOutputDto;
         } catch (IOException | InterruptedException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
-
     }
 }
