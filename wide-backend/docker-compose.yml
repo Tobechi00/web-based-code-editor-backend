@@ -4,3 +4,7 @@ services:
     container_name: py_code_container
     image: python
     command: tail -f /dev/null
+  java_code_container:
+    container_name: java_code_container
+    image: amazoncorretto:17-alpine3.19-jdk
+    command: tail -f /dev/null

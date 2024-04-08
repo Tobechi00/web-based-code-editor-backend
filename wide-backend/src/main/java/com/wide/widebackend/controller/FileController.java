@@ -20,7 +20,7 @@ controller for all file processing and retrieval apis
 @RequestMapping("/w-ide/api")
 public class FileController {
 
-    Logger logger = LoggerFactory.getLogger(FileController.class);
+    private final Logger logger = LoggerFactory.getLogger(FileController.class);
     private final UserService userService;
 
     public FileController(UserService userService){
