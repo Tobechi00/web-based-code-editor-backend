@@ -21,10 +21,10 @@ public class JavaRunnerService implements CodeRunnerService<ProgramOutputDTO>{
         try{
             StringBuilder output = new StringBuilder();
 
-            String[] command;
+            String[] commands;
 
             if (fileName.isEmpty()) {
-                command = new String[]{
+                commands = new String[]{
                         "docker",                 // Command to run Docker
                         "exec",                   // Docker sub-command to execute a command in a running container
                         "-i",                     // Option to keep STDIN open even if not attached
@@ -37,7 +37,7 @@ public class JavaRunnerService implements CodeRunnerService<ProgramOutputDTO>{
                 String file = fileName.get();
                 String classFileName = file.substring(0,file.lastIndexOf("."));
 
-                command = new String[]{
+                commands = new String[]{
                         "docker",                 // Command to run Docker
                         "exec",                   // Docker sub-command to execute a command in a running container
                         "-i",                     // Option to keep STDIN open even if not attached
@@ -48,7 +48,7 @@ public class JavaRunnerService implements CodeRunnerService<ProgramOutputDTO>{
                 };
             }
 
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
             processBuilder.redirectErrorStream(true);
 
@@ -86,9 +86,33 @@ public class JavaRunnerService implements CodeRunnerService<ProgramOutputDTO>{
         try{
             StringBuilder output = new StringBuilder();
 
-            String[] command = {"docker", "exec","-i", "java_code_container","echo"+code + "|" + "jshell"};
+            String[] commands;
+            if (fileName.isEmpty()) {
+                commands = new String[]{
+                        "docker",                 // Command to run Docker
+                        "exec",                   // Docker sub-command to execute a command in a running container
+                        "-i",                     // Option to keep STDIN open even if not attached
+                        "java_code_container",    // Name of the Docker container to execute the command in
+                        "sh",                     // Command shell to execute the following command
+                        "-c",                     // Option to pass a string to the command shell
+                        "echo '" + code + "' > Main.java && javac Main.java && java Main &&"+input // Command to echo code and pipe it to JShell
+                };
+            }else {
+                String file = fileName.get();
+                String classFileName = file.substring(0,file.lastIndexOf("."));
 
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+                commands = new String[]{
+                        "docker",                 // Command to run Docker
+                        "exec",                   // Docker sub-command to execute a command in a running container
+                        "-i",                     // Option to keep STDIN open even if not attached
+                        "java_code_container",    // Name of the Docker container to execute the command in
+                        "sh",                     // Command shell to execute the following command
+                        "-c",                     // Option to pass a string to the command shell
+                        "echo '" + code + "' > "+file+" "+" && javac "+file+" && java "+classFileName+" && "+input // Command to echo code and pipe it to JShell
+                };
+            }
+
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
             processBuilder.redirectErrorStream(true);
 

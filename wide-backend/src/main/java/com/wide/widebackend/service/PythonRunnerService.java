@@ -33,10 +33,10 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
             StringBuilder programOutput = new StringBuilder();
 
             //array of commands to be run sequentially
-            String[] command = {"docker", "exec", "-i", "py_code_container", "python", "-c", code};
+            String[] commands = {"docker", "exec", "-i", "py_code_container", "python", "-c", code};
 
             // Create a process builder
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
             // Redirect error stream to standard output
             processBuilder.redirectErrorStream(true);
@@ -83,10 +83,10 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
 
 
             //array of commands to be run sequentially
-            String[] command = {"docker", "exec", "-i", "py_code_container", "python", "-c", code, input};
+            String[] commands = {"docker", "exec", "-i", "py_code_container", "python", "-c", code, input};
 
             // Create a process builder
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
             // Redirect error stream to standard output
             processBuilder.redirectErrorStream(true);
