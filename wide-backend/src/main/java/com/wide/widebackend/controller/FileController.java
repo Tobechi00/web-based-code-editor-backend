@@ -1,7 +1,7 @@
 package com.wide.widebackend.controller;
 
 import com.wide.widebackend.Entity.User;
-import com.wide.widebackend.service.UserService;
+import com.wide.widebackend.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ controller for all file processing and retrieval apis
 @RequestMapping("/w-ide/api")
 public class FileController {
 
-    private final Logger logger = LoggerFactory.getLogger(FileController.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserService userService;
 
     public FileController(UserService userService){

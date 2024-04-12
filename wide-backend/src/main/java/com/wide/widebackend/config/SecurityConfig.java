@@ -1,6 +1,6 @@
 package com.wide.widebackend.config;
 
-import com.wide.widebackend.service.UserService;
+import com.wide.widebackend.service.user.UserService;
 import jakarta.servlet.Filter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

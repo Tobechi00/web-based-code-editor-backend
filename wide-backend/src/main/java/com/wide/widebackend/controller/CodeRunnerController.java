@@ -2,9 +2,10 @@ package com.wide.widebackend.controller;
 
 import com.wide.widebackend.dataobjects.dao.ProgramInputDAO;
 import com.wide.widebackend.dataobjects.dto.ProgramOutputDTO;
-import com.wide.widebackend.service.CodeRunnerService;
-import com.wide.widebackend.service.JavaRunnerService;
-import com.wide.widebackend.service.PythonRunnerService;
+import com.wide.widebackend.service.code.CodeRunnerService;
+import com.wide.widebackend.service.code.GccRunnerService;
+import com.wide.widebackend.service.code.JavaRunnerService;
+import com.wide.widebackend.service.code.PythonRunnerService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,19 @@ public class CodeRunnerController {
     private final PythonRunnerService pythonRunnerService;
     private final JavaRunnerService javaRunnerService;
 
-    public CodeRunnerController(PythonRunnerService pythonService, JavaRunnerService javaRunnerService) {
+    private final GccRunnerService gccRunnerService;
+
+    public CodeRunnerController(
+            PythonRunnerService pythonService,
+            JavaRunnerService javaRunnerService,
+            GccRunnerService gccRunnerService) {
+
         this.pythonRunnerService = pythonService;
         this.javaRunnerService = javaRunnerService;
+        this.gccRunnerService = gccRunnerService;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(CodeRunnerController.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final int TIME_LIMIT = 20;
 
 
@@ -88,6 +96,35 @@ public class CodeRunnerController {
             }
         }
 
+    }
+
+    @PostMapping(value = "c/exec")
+    public ResponseEntity<ProgramOutputDTO> runGccCode(@RequestBody ProgramInputDAO programInputDao){
+        if (programInputDao.getUserInput().isEmpty()){
+            try{
+                return runCodeWithoutInput(
+                        programInputDao.getProgram(),
+                        gccRunnerService,
+                        programInputDao.getFileName(),
+                        logger);
+            }catch (Exception e){
+                logger.error(e.getMessage());
+                return ResponseEntity.internalServerError().build();
+            }
+
+        }else {
+            try {
+                return runCodeWithInput(programInputDao.getProgram(),
+                        programInputDao.getUserInput().get(),
+                        gccRunnerService,
+                        programInputDao.getFileName(),
+                        logger);
+
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                return ResponseEntity.internalServerError().build();
+            }
+        }
     }
 
     //completable future to prevent resource hogging
