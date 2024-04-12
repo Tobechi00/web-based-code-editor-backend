@@ -1,4 +1,4 @@
-package com.wide.widebackend.service;
+package com.wide.widebackend.service.user;
 
 import com.wide.widebackend.Entity.PrincipalUser;
 import com.wide.widebackend.Entity.User;

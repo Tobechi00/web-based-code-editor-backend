@@ -1,4 +1,4 @@
-package com.wide.widebackend.service;
+package com.wide.widebackend.service.code;
 
 import org.springframework.stereotype.Service;
 

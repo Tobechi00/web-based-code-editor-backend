@@ -6,7 +6,7 @@ import com.wide.widebackend.customexceptions.UserAlreadyExistsException;
 import com.wide.widebackend.dataobjects.dao.UserDTO;
 import com.wide.widebackend.dataobjects.dto.LoginDAO;
 import com.wide.widebackend.dataobjects.dto.RegistrationDAO;
-import com.wide.widebackend.service.UserService;
+import com.wide.widebackend.service.user.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class LoginRegistrationController {
 
     private final DaoAuthenticationProvider authenticationProvider;
     private final PasswordEncoder passwordEncoder;
-    private final Logger logger = LoggerFactory.getLogger(LoginRegistrationController.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public LoginRegistrationController(UserService userService, JwtGenerator jwtGenerator, DaoAuthenticationProvider daoAuthenticationProvider,PasswordEncoder passwordEncoder) {
         this.userService = userService;
