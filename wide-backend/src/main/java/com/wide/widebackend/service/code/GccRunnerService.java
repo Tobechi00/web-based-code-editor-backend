@@ -19,23 +19,37 @@ public class GccRunnerService implements CodeRunnerService<ProgramOutputDTO> {
         try{
             StringBuilder output = new StringBuilder();
 
-            String[] commands;
-
-                commands = new String[]{
+            String[] fileCreationCommands = new String[]{
                         "docker",                 // Command to run Docker
                         "exec",                   // Docker sub-command to execute a command in a running container
                         "-i",                     // Option to keep STDIN open even if not attached
                         "gcc_code_container",    // Name of the Docker container to execute the command in
                         "sh",                     // Command shell to execute the following command
                         "-c",                     // Option to pass a string to the command shell
-                        "echo '" + code + "' > Main.c && gcc Main.c -o Main && ./Main" // Command to echo code and pipe it to JShell
+                        "echo '" + code + "' > Main.c && gcc Main.c -o Main"
                 };
 
-            ProcessBuilder processBuilder = new ProcessBuilder(commands);
+            String[] fileRunCommmands = new String[]{
+                    "docker",                 // Command to run Docker
+                    "exec",                   // Docker sub-command to execute a command in a running container
+                    "-i",                     // Option to keep STDIN open even if not attached
+                    "gcc_code_container",    // Name of the Docker container to execute the command in
+                    "sh",                     // Command shell to execute the following command
+                    "-c",
+                    "./Main"
+            };
 
-            processBuilder.redirectErrorStream(true);
+            ProcessBuilder processBuilder = new ProcessBuilder(fileCreationCommands);
 
             Process process = processBuilder.start();
+
+            process.waitFor();
+
+            processBuilder = new ProcessBuilder(fileRunCommmands);
+            processBuilder.redirectErrorStream(true);
+
+            long startTime = System.nanoTime();
+            process = processBuilder.start();
 
             InputStream inputStream = process.getInputStream();
             BufferedReader reader = new BufferedReader(
@@ -49,18 +63,21 @@ public class GccRunnerService implements CodeRunnerService<ProgramOutputDTO> {
             }
 
             int exitCode = process.waitFor();
+            long endTime = System.nanoTime();
 
             inputStream.close();
             reader.close();
 
             programOutputDTO.setExitCode(exitCode);
             programOutputDTO.setProgramOutput(output.toString());
+            programOutputDTO.setExecutionTime(endTime - startTime);
             return programOutputDTO;
         } catch (IOException | InterruptedException e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public ProgramOutputDTO runCodeWithInput(String code, String input, Optional<String> fileName) {
@@ -69,49 +86,59 @@ public class GccRunnerService implements CodeRunnerService<ProgramOutputDTO> {
         try {
             StringBuilder output = new StringBuilder();
 
-            String[] commands;
-                commands = new String[]{
-                        "docker",                 // Command to run Docker
-                        "exec",                   // Docker sub-command to execute a command in a running container
-                        "-i",                     // Option to keep STDIN open even if not attached
-                        "java_code_container",    // Name of the Docker container to execute the command in
-                        "sh",                     // Command shell to execute the following command
-                        "-c",                     // Option to pass a string to the command shell
-                        "echo '" + code + "' > Main.c && gcc Main.c -o Main && ./Main &&" + input // Command to echo code and pipe it to JShell
-                };
+            String[] fileCreationCommands = new String[]{
+                    "docker",                 // Command to run Docker
+                    "exec",                   // Docker sub-command to execute a command in a running container
+                    "-i",                     // Option to keep STDIN open even if not attached
+                    "gcc_code_container",    // Name of the Docker container to execute the command in
+                    "sh",                     // Command shell to execute the following command
+                    "-c",                     // Option to pass a string to the command shell
+                    "echo '" + code + "' > Main.c && gcc Main.c -o Main"
+            };
 
-                ProcessBuilder processBuilder = new ProcessBuilder(commands);
+            String[] fileRunCommmands = new String[]{
+                    "docker",                 // Command to run Docker
+                    "exec",                   // Docker sub-command to execute a command in a running container
+                    "-i",                     // Option to keep STDIN open even if not attached
+                    "gcc_code_container",    // Name of the Docker container to execute the command in
+                    "sh",                     // Command shell to execute the following command
+                    "-c",
+                    "echo "+input+" | ./Main"
+            };
 
-                processBuilder.redirectErrorStream(true);
+            ProcessBuilder processBuilder = new ProcessBuilder(fileCreationCommands);
 
-                Process process = processBuilder.start();
+            Process process = processBuilder.start();
 
-                OutputStream outputStream = process.getOutputStream();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+            process.waitFor();
 
-                bufferedWriter.write(input);
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
+            processBuilder = new ProcessBuilder(fileRunCommmands);
+            processBuilder.redirectErrorStream(true);
 
-                InputStream inputStream = process.getInputStream();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(inputStream)
-                );
+            long startTime = System.nanoTime();
+            process = processBuilder.start();
+
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(inputStream)
+            );
 
 
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    output.append(line).append("\n");
-                }
+            String line;
+            while ((line = reader.readLine()) != null){
+                output.append(line).append("\n");
+            }
 
-                int exitCode = process.waitFor();
+            int exitCode = process.waitFor();
+            long endTime = System.nanoTime();
 
-                inputStream.close();
-                reader.close();
+            inputStream.close();
+            reader.close();
 
-                programOutputDTO.setExitCode(exitCode);
-                programOutputDTO.setProgramOutput(output.toString());
-                return programOutputDTO;
+            programOutputDTO.setExitCode(exitCode);
+            programOutputDTO.setProgramOutput(output.toString());
+            programOutputDTO.setExecutionTime(endTime - startTime);
+            return programOutputDTO;
         }catch (IOException | InterruptedException e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
