@@ -41,6 +41,7 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
             // Redirect error stream to standard output
             processBuilder.redirectErrorStream(true);
 
+            long startTime = System.nanoTime();
             // Start the process
             Process process = processBuilder.start();
 
@@ -57,7 +58,8 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
 
             // Wait for the process to complete
             int exitCode = process.waitFor();
-//            System.out.println("Exited with error code: " + exitCode);
+
+            long endTime = System.nanoTime();
 
             inputStream.close();
             reader.close();
@@ -65,7 +67,7 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
             programOutputDto.setExitCode(exitCode);
 
             programOutputDto.setProgramOutput(programOutput.toString());
-
+            programOutputDto.setExecutionTime(endTime - startTime);
             return programOutputDto;
         } catch (IOException | InterruptedException e) {
             logger.error(e.getMessage());
@@ -90,6 +92,9 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
 
             // Redirect error stream to standard output
             processBuilder.redirectErrorStream(true);
+
+            //log process start time
+            long startTime = System.nanoTime();
 
             // Start the process
             Process process = processBuilder.start();
@@ -116,6 +121,7 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
 
             // Wait for the process to complete
             int exitCode = process.waitFor();
+            long endTime = System.nanoTime();
 
             //close all writers and streams
             inputStream.close();
@@ -126,6 +132,7 @@ public class PythonRunnerService implements CodeRunnerService<ProgramOutputDTO> 
             //setting DAO;
             programOutputDto.setExitCode(exitCode);
             programOutputDto.setProgramOutput(programOutput.toString());
+            programOutputDto.setExecutionTime(endTime - startTime);
 
             return programOutputDto;
         } catch (IOException | InterruptedException e) {
