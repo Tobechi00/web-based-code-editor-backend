@@ -157,7 +157,7 @@ public class JavaRunnerService implements CodeRunnerService<ProgramOutputDTO>{
                         fileName.get(),
                         code);
             }
-//            echo "+input+" | java "+classFileName
+
             runClassFileCommands = createRunClassFileCommandsWithInput(
                     classFileName,
                     input
